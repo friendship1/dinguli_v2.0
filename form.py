@@ -115,16 +115,25 @@ bob_menu = {
             "title": "학생식당 ",
             "description": "",
             "imageUrl": "",
+            "link" : {
+                "web" : ""
+            }
         },
         {
             "title": "연구동   ",
             "description": "",
             "imageUrl": "",
+            "link" : {
+                "web" : ""
+            }
         },
         {
             "title": "교직원   ",
             "description": "",
             "imageUrl": "",
+            "link" : {
+                "web" : ""
+            }
         }
         ],
         "buttons": [
@@ -139,9 +148,9 @@ bob_menu = {
 #            "messageText": "별점 주기"
 #        } 
         {
-            "label": "소통하기",
+            "label": "Be interactive",
             "action": "block",
-            "messageText": "소통하기",
+            "messageText": "Be interactive",
             "blockId": "5d301014ffa748000122d182"
         }
         ]
@@ -515,6 +524,11 @@ cards = {
         ],
         "quickReplies": [ 
         {
+            "label": "홈",
+            "action": "message",
+            "messageText": "홈",
+        },
+        {
             "label": "이전",
             "action": "block",
             "messageText": "이전",
@@ -533,6 +547,15 @@ cards = {
             }
         },
         {
+            "label": "추천순(today)",
+            "action": "block",
+            "messageText": "좋아요순",
+            "blockId": "5d317a548192ac000132c371",
+            "extra": {
+                "page": "mostlike_today"
+            }
+        },
+        {
             "label": "최신순",
             "action": "block",
             "messageText": "최신순",
@@ -542,16 +565,7 @@ cards = {
             }
         },
         {
-            "label": "좋아요순(today)",
-            "action": "block",
-            "messageText": "좋아요순",
-            "blockId": "5d317a548192ac000132c371",
-            "extra": {
-                "page": "mostlike_today"
-            }
-        },
-        {
-            "label": "좋아요순",
+            "label": "추천순",
             "action": "block",
             "messageText": "좋아요순",
             "blockId": "5d317a548192ac000132c371",
@@ -567,12 +581,7 @@ cards = {
             "extra": {
                 "page": "mycard"
             }
-        },  
-        {
-            "label": "홈",
-            "action": "message",
-            "messageText": "홈",
-        },
+        }
         ]
     },
     "context": {

@@ -12,9 +12,10 @@ from email.MIMEMultipart import MIMEMultipart
 from email.header import Header
 
 import form
+import my_private
 
-sqlpasswd = "password"
-admin_list = ['2f16c12f16c12f16c12f16c12f16c12f16c12f16c12f16c12f16c12f16c1', '2f16c12f16c12f16c12f16c12f16c12f16c12f16c12f16c12f16c12f16c1']
+sqlpasswd = my_private.sqlpasswd 
+admin_list = my_private.admin_list
 
 def mk_fallback(value):    
     if(len(value["contexts"]) == 0): # Normal Fallback
@@ -55,9 +56,9 @@ def label2kor(rest, sort_type, page):
     if(sort_type == "latest"):
         sort_ = "최신순"
     elif(sort_type == "mostlike"):
-        sort_ = "좋아요순(every)"
+        sort_ = "추천순(whole)"
     elif(sort_type == "mostlike_today"):
-        sort_ = "좋아요순(today)"
+        sort_ = "추천순(today)"
     elif(sort_type == "mycard"):
         sort_ = "내 포스트"
     else:
@@ -123,17 +124,17 @@ def get_img(rest_type):
     conn = pymysql.connect(host='localhost', user='root', password=sqlpasswd, db='open_kakao')
     curs = conn.cursor()
     if(proper_time() == 'lunch'):
-        sql = "SELECT img_name FROM cards WHERE rest=\"%s\" AND DATE(update_time)=DATE(NOW()) AND HOUR(update_time) < 16 ORDER BY likes DESC LIMIT 1" %(rest_type)
+        sql = "SELECT card_id, img_name FROM cards WHERE rest=\"%s\" AND DATE(update_time)=DATE(NOW()) AND HOUR(update_time) < 16 ORDER BY likes DESC LIMIT 1" %(rest_type)
 
     else:
-        sql = "SELECT img_name FROM cards WHERE rest=\"%s\" AND DATE(update_time)=DATE(NOW()) AND HOUR(update_time) >= 16 ORDER BY likes DESC LIMIT 1" %(rest_type)
+        sql = "SELECT card_id, img_name FROM cards WHERE rest=\"%s\" AND DATE(update_time)=DATE(NOW()) AND HOUR(update_time) >= 16 ORDER BY likes DESC LIMIT 1" %(rest_type)
 
 # sql = "SELECT name_save, reg_time FROM upload_menu WHERE rest_type=\"%s\" AND meal_type=\"%s\" AND DATE(reg_time)=DATE(NOW()) ORDER BY reg_time DESC LIMIT 2" %(rest_type, proper_time()) # This was for web upload only
     curs.execute(sql)
     rows = curs.fetchall()
     conn.close()
     if(len(rows) == 0): # if file not exist
-        return (("error.jpg"),)
+        return ((0, "error.jpg"),)
     return rows
 
 def get_star(rest_type):
@@ -153,9 +154,11 @@ def mk_bob_menu():
     conn = pymysql.connect(host='localhost', user='root', password=sqlpasswd, db='open_kakao')
     curs = conn.cursor()
     for idx,rest in enumerate(rest_list):
-        val = get_img(rest)[0][0]
-        if val == 'error.jpg': val = '' # THIS IS BECAUSE CAHCHED IMAGE
-        bob_menu['listCard']['items'][idx]['imageUrl'] = addr + val
+        proper_card = get_img(rest)[0]
+        image_name = proper_card[1]
+        if image_name == 'error.jpg': image_name = '' # THIS IS BECAUSE CAHCHED IMAGE
+        bob_menu['listCard']['items'][idx]['imageUrl'] = addr + image_name
+        bob_menu['listCard']['items'][idx]['link']['web'] = "http://www.dgrang.com/kakao_files/show.php?num=" + str(proper_card[0])
         sql = "SELECT AVG(star), COUNT(star) FROM stars WHERE rest_type=\"%s\" AND meal_type=\"%s\" AND time=\"%s\"" %(rest, time, today_date())
         curs.execute(sql)
         rows = curs.fetchall()
@@ -323,7 +326,7 @@ def mk_showcards(rest, sort_type, prev_page, page, user_id): # Called from showc
             card['buttons'][1]['label'] = "추천"
             card['buttons'][1]['messageText'] = "추천"
         # Add delete buttoon
-        if(row[1] == user_id or user_id in admin_list): # show delete btn only if post is written by user.
+        if(row[1] == user_id or user_id in admin_list): # show delete btn only if post is written by user. (or admin)
             cardDelBtn = json.loads(form.cardDelBtn_json)
             cardDelBtn['extra']['cardId'] = cardId
             card['buttons'].append(cardDelBtn)
@@ -448,7 +451,7 @@ def mk_mailveri1(value): # create key, store at DB (temperarly), send email.
         mail_to = text
         s = smtplib.SMTP('smtp.gmail.com', 587)
         s.starttls()
-        s.login(mail_from, 'password') # password is here be careful
+        s.login(mail_from, my_private.gmailpasswd) # password is here be careful
         msg=MIMEMultipart('alternative')
         msg['From'] = mail_from
         msg['To'] = mail_to
