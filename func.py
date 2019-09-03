@@ -84,7 +84,7 @@ def mk_uploaddone(value):
     if(seperate != -1):
         title = text[:seperate]
     text = text[seperate+1:]
-    sql = "INSERT INTO cards(id, rest, img_name, title, text) VALUES(\"%s\",\"%s\",\"%s\",\"%s\",\"%s\")" %(user_id, rest, filename, title, text)
+    sql = "INSERT INTO cards(id, rest, update_time, img_name, title, text) VALUES(\"%s\",\"%s\",NOW(),\"%s\",\"%s\",\"%s\")" %(user_id, rest, filename, title, text)
     curs.execute(sql)
     conn.commit() # should be added if sql INSERT!
     rows = curs.fetchall()
