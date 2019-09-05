@@ -50,7 +50,7 @@ def label2kor(rest, sort_type, page):
     elif(rest == 'r1'):
         rest_ = "연구동   "
     elif(rest == 'staff'):
-        rset_ = "교직원   "
+        rest_ = "교직원   "
     else:
         rest_ = "기타     "
     if(sort_type == "latest"):
